@@ -344,6 +344,20 @@ INSERT sales VALUES('7131','P3087a', 5/29/93, 25, 'Net 60', 'PS7777')
 INSERT sales VALUES('7067','P2121', 6/15/92, 20, 'Net 30', 'TC4203')
 INSERT sales VALUES('7067','P2121', 6/15/92, 20, 'Net 30', 'TC7777')
 
+/*
+1 ошибка - не было ; в конце строк
+2 ошибка - в 4 строке 'CA, '94111' не было знака ', (не закрытое обозначение строки)
+3 ошибка - пропустил royality titles, сделал
+4 ошибка varchar to datetime выходило за диапазон, вводим данные через datetime напрямую
+5 ошибка - строка дублирует, удалил т.к данные полностью идентичны
+6 ошибка - к автору с id 111-00-0004 привязывает несуществующую книгу с id PC2222
+7, 8 ошибки - к автору с 998-72-3567, 998-72-3567 привязывает несуществующую книгу с id PS2091
+9 ошибка - снова несущ книга
+10 ошибки - аналогично 4 ошибке, строки
+11 ошибка несущ книга
+*/
+
+
 -- использовалось для отладки
 /*
 DECLARE @value int;
@@ -378,11 +392,20 @@ GO
 SELECT * FROM authors_UT;
 GO
 */
---шел по пунктам, требовалось для работы
+--копирование части авторов
 SELECT * INTO authors_UT FROM authors WHERE state = 'UT';
 GO
-
 DELETE FROM authors WHERE state = 'UT';
 GO
 INSERT INTO authors SELECT * FROM authors_UT;
+GO
+
+--представление из таблиц
+CREATE VIEW [dbo].[View_1]
+AS
+SELECT        dbo.titles.title_id AS Expr2, dbo.authors.au_id
+FROM            dbo.authors INNER JOIN
+                         dbo.titleauthor ON dbo.authors.au_id = dbo.titleauthor.au_id INNER JOIN
+                         dbo.titles ON dbo.titleauthor.title_id = dbo.titles.title_id INNER JOIN
+                         dbo.sales ON dbo.titles.title_id = dbo.sales.title_id
 GO
